@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page Title</title>
+<style>
+html,body {height: 100%; width: 100%; margin: 0; padding: 0;}
+
+.image-container {
+  position: relative;
+  background-color: #f4f4f4;
+  border: 2px solid white;
+}
+
+#current-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+}
+
+footer {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  padding: 15px;
+  z-index: 100;
+  background-color: rgba(255, 255, 255, 0.8);
+  text-align: right;
+}
+
+.author-info a {
+  color: #000;
+  text-decoration: none;
+}
+
+#menu-btn {
+  position: fixed;
+  top: 0;
+  right: 0px;
+  z-index: 100;
+}
+#menu {
+  position: fixed;
+  top: 0;
+  right: -250px;
+  bottom: 0;
+  width: 250px;
+  z-index: 99;
+  background-color: #f5f5f5;
+  overflow: auto;
+  overflow-x: hidden;
+  transition: right 0.3s ease-out;
+}
+#menu.open {
+  right: 0;
+}
+#menu p {
+  width: 100%;
+  text-align: center;
+}
+#menu p:hover {
+  background-color: #ccc;
+  cursor: pointer;
+}
+</style>
+</head>
+<body>
+<img id="menu-btn" src="menu.png" alt="menu">
+<div id="menu"></div>
+
+<div class="image-container">
+  <img id="current-image" src="beautipy.png" alt="image">
+</div>
+
+<footer>
+  <div class="author-info">
+    <p>Created by <a href="https://github.com/yesaouo">Yesa</a></p>
+    <p>Copyright © 2023</p>
+  </div>
+</footer>
+
+<script>
+function Get(yourUrl){
+  var Httpreq = new XMLHttpRequest();
+  Httpreq.open("GET",yourUrl,false);
+  Httpreq.send(null);
+  return Httpreq.responseText;
+}
+
+let images = []
+const imgJSON = JSON.parse(Get('https://yesaouo.github.io/Beautipy/image.json'));
+let right_menu = '';
+for(let i in imgJSON){
+  if(imgJSON[i][1].length != 0)
+  right_menu += '<p id="title">' + i + '</p>';
+}
+document.getElementById('menu').innerHTML = right_menu;
+
+let currentIndex = 0;
+const currentImage = document.querySelector('#current-image');
+currentImage.addEventListener('click', event => {
+  if (event.clientX < window.innerWidth / 2) {
+    currentIndex = currentIndex > 0 ? currentIndex - 1 : images.length;
+  } else {
+    currentIndex = currentIndex < images.length ? currentIndex + 1 : 0;
+  }
+  if (images.length == 0 || currentIndex == images.length) {
+    currentImage.src = 'end.png';
+  } else {
+    currentImage.src = images[currentIndex];
+  }
+});
+
+document.onclick=function(e){
+  if(e.target.id == 'title'){
+    console.log(e.target.innerHTML);
+    for(let i in imgJSON){
+      if(i == e.target.innerHTML){
+        images = imgJSON[i][1];
+        currentIndex = 0;
+        currentImage.src = images[currentIndex];
+      }
+    }
+  }
+}
+</script>
+<script>
+var menuBtn = document.getElementById("menu-btn");
+var menu = document.getElementById("menu");
+menuBtn.addEventListener("click", function() {
+  menu.classList.toggle("open");
+});
+</script>
+</body>
+</html>
