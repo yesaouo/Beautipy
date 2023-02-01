@@ -84,56 +84,79 @@ footer {
 </footer>
 
 <script>
-function Get(yourUrl){
-  var Httpreq = new XMLHttpRequest();
-  Httpreq.open("GET",yourUrl,false);
-  Httpreq.send(null);
-  return Httpreq.responseText;
-}
-
-let images = []
+var menuBtn = document.getElementById("menu-btn");
+var menu = document.getElementById("menu");
+let images = ['beautipy.png','instructions.png'];
+let right_menu = '<p id="title">Home</p>';
+let imgObject = {'Home':[0,['beautipy.png','instructions.png']]};
+let currentIndex = 0;
+let currentTitle = 0;
+let totalTitle = 0;
 const imgJSON = JSON.parse(Get('https://yesaouo.github.io/Beautipy/image.json'));
-let right_menu = '';
+const currentImage = document.querySelector('#current-image');
 for(let i in imgJSON){
-  if(imgJSON[i][1].length != 0)
-  right_menu += '<p id="title">' + i + '</p>';
+  if(imgJSON[i][1].length != 0){
+    right_menu += '<p id="title">' + i + '</p>';
+    imgObject[i] = [++totalTitle,imgJSON[i][1]];
+  }
 }
 document.getElementById('menu').innerHTML = right_menu;
 
-let currentIndex = 0;
-const currentImage = document.querySelector('#current-image');
-currentImage.addEventListener('click', event => {
-  if (event.clientX < window.innerWidth / 2) {
-    currentIndex = currentIndex > 0 ? currentIndex - 1 : images.length;
-  } else {
-    currentIndex = currentIndex < images.length ? currentIndex + 1 : 0;
-  }
-  if (images.length == 0 || currentIndex == images.length) {
-    currentImage.src = 'end.png';
-  } else {
-    currentImage.src = images[currentIndex];
-  }
-});
-
-document.onclick=function(e){
-  if(e.target.id == 'title'){
-    console.log(e.target.innerHTML);
-    for(let i in imgJSON){
-      if(i == e.target.innerHTML){
-        images = imgJSON[i][1];
-        currentIndex = 0;
-        currentImage.src = images[currentIndex];
-      }
-    }
-  }
+function Get(yourURL){
+  var Httpreq = new XMLHttpRequest();
+  Httpreq.open("GET",yourURL,false);
+  Httpreq.send(null);
+  return Httpreq.responseText;
 }
-</script>
-<script>
-var menuBtn = document.getElementById("menu-btn");
-var menu = document.getElementById("menu");
+function switchImage(){
+  if (images.length == 0 || currentIndex == images.length) currentImage.src = 'end.png';
+  else currentImage.src = images[currentIndex];
+}
+function switchTitle(){
+  images = Object.values(imgObject)[currentTitle][1];
+  currentIndex = 0;
+  currentImage.src = images[currentIndex];
+}
+
+currentImage.addEventListener('click', event => {
+  if (event.clientX < window.innerWidth / 2) currentIndex = currentIndex > 0 ? currentIndex - 1 : images.length;
+  else currentIndex = currentIndex < images.length ? currentIndex + 1 : 0;
+  switchImage();
+});
 menuBtn.addEventListener("click", function() {
   menu.classList.toggle("open");
 });
+document.onclick=function(e){
+  if(e.target.id == 'title'){
+    currentTitle = imgObject[e.target.innerHTML][0];
+    images = imgObject[e.target.innerHTML][1];
+    currentIndex = 0;
+    currentImage.src = images[currentIndex];
+  }
+}
+
+function Keydown(e) {
+  if(e.keyCode==27) {
+    menu.classList.toggle("open");
+  }
+  if(e.keyCode==37) {
+    currentIndex = currentIndex > 0 ? currentIndex - 1 : images.length;
+    switchImage();
+  }
+  if(e.keyCode==39) {
+    currentIndex = currentIndex < images.length ? currentIndex + 1 : 0;
+    switchImage();
+  }
+  if(e.keyCode==38) {
+    currentTitle = currentTitle > 0 ? currentTitle - 1 : totalTitle;
+    switchTitle();
+  }
+  if(e.keyCode==40) {
+    currentTitle = currentTitle < totalTitle ? currentTitle + 1 : 0;
+    switchTitle();
+  }
+}
+document.addEventListener('keydown', Keydown, false);
 </script>
 </body>
 </html>
