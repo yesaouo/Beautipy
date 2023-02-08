@@ -24,7 +24,7 @@ def crawlPTT(page,newPage):
   ban = ['[公告]','[帥哥]','大尺碼']
   img_url = checkJSONFile('image.json')
   new_img = {}
-  newImg = []
+  newImg = 0
 
   for i in range(newPage,newPage-page,-1):
     web = requests.get(f'https://www.ptt.cc/bbs/Beauty/index{i}.html', cookies={'over18':'1'})
@@ -46,8 +46,8 @@ def crawlPTT(page,newPage):
       imgs = soup.find_all('img')
       imgList = []
       for i in imgs:
-        newImg.append(i['src'])
-        imgList.append(i['src'])
+        newImg += 1
+        imgList.append(i['src'].replace('cache.ptt.cc/c/https/',''))
       new_img[title].append(imgList)
 
   if img_url:
@@ -58,6 +58,6 @@ def crawlPTT(page,newPage):
   with open('image.json','w',encoding='utf-8') as f:
     json.dump(img_url,f,indent=1,ensure_ascii=False)
   
-  print(f'爬取完成，新增了 {len(newImg)} 張圖片')
+  print(f'爬取完成，新增了 {newImg} 張圖片')
 
 crawlPTT(int(input('爬取頁數(圖多注意): ')),getPage())
